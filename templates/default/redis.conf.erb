@@ -1,3 +1,4 @@
+<% redis_2_4 = (node["redis2"]["version"].split(".").map(&:to_i) <=> [2, 4]) < 0 %>
 <% def critical(val); raise RuntimeError unless val; val; end %>
 # Redis configuration file template
 
@@ -308,6 +309,7 @@ appendfsync <%= @conf["appendfsync"] %>
 # "no" that is the safest pick from the point of view of durability.
 no-appendfsync-on-rewrite <%= @conf["no_appendfsync_on_rewrite"] %>
 
+<% if redis_2_4 -%>
 ################################ VIRTUAL MEMORY ###############################
 
 # Virtual Memory allows Redis to work with datasets bigger than the actual
@@ -378,6 +380,7 @@ vm-pages <%= @conf["vm"]["pages"] %>
 # The special value of 0 turn off threaded I/O and enables the blocking
 # Virtual Memory implementation.
 vm-max-threads <%= @conf["vm"]["max_threads"] %>
+<% end -%>
 
 ############################### ADVANCED CONFIG ###############################
 
@@ -385,8 +388,10 @@ vm-max-threads <%= @conf["vm"]["max_threads"] %>
 # have at max a given numer of elements, and the biggest element does not
 # exceed a given threshold. You can configure this limits with the following
 # configuration directives.
+<% if redis_2_4 -%>
 hash-max-zipmap-entries 512
 hash-max-zipmap-value 64
+<% end -%>
 
 # Similarly to hashes, small lists are also encoded in a special way in order
 # to save a lot of space. The special representation is only used when
